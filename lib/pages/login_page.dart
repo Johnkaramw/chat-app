@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:scholar_chat/consts.dart';
@@ -5,10 +7,13 @@ import 'package:scholar_chat/pages/sign_up.dart';
 import 'package:scholar_chat/widgets/pottons.dart';
 import 'package:scholar_chat/widgets/text%20_field.dart';
 
-// ignore: must_be_immutable
 class LoginPage extends StatelessWidget {
+  static const String id = 'login_page'; // إضافة معرف ثابت للصفحة
+  String? email;
+  String? password;
+
   LoginPage({Key? key}) : super(key: key);
-  String id = 'SignPage';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,21 +22,17 @@ class LoginPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 9),
         child: Column(
           children: [
-            const Spacer(
-              flex: 1,
-            ),
+            const Spacer(flex: 1),
             Image.asset('assets/images/scholar.png'),
             const Text(
-              'App Chat ',
+              'App Chat',
               style: TextStyle(
                 fontSize: 30,
                 color: Colors.black,
                 fontFamily: 'Pacifico',
               ),
             ),
-            const Spacer(
-              flex: 2,
-            ),
+            const Spacer(flex: 2),
             const Row(
               children: [
                 Text(
@@ -43,39 +44,44 @@ class LoginPage extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             CustomText(
+              onChanged: (data) {
+                email = data;
+              },
               hintText: 'email',
             ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             CustomText(
-              hintText: 'passowrd',
+              onChanged: (data) {
+                password = data;
+              },
+              hintText: 'password',
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             CustomPotton(
               text: 'login ',
             ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  'don\'t have accont ! ',
+                  'don\'t have an account! ',
                   style: TextStyle(
                     color: Colors.black,
                   ),
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, SignPage().id);
+                    Navigator.pushNamed(
+                      context,
+                      SignPage.id,
+                      arguments: {
+                        'email': email ?? '',
+                        'password': password ?? ''
+                      },
+                    );
                   },
                   child: const Text(
                     '   sign up',
@@ -84,9 +90,7 @@ class LoginPage extends StatelessWidget {
                 ),
               ],
             ),
-            const Spacer(
-              flex: 4,
-            ),
+            const Spacer(flex: 4),
           ],
         ),
       ),

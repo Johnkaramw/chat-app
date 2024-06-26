@@ -4,7 +4,6 @@ import 'package:scholar_chat/firebase_options.dart';
 import 'package:scholar_chat/pages/login_page.dart';
 import 'package:scholar_chat/pages/sign_up.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -19,12 +18,19 @@ class ChatApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      routes: {
-        LoginPage().id: (context) => LoginPage(),
-        SignPage().id: (context) => SignPage(),
+      initialRoute: LoginPage.id,
+      onGenerateRoute: (settings) {
+        if (settings.name == LoginPage.id) {
+          return MaterialPageRoute(builder: (context) => LoginPage());
+        } else if (settings.name == SignPage.id) {
+          final args = settings.arguments as Map<String, String>;
+          return MaterialPageRoute(
+            builder: (context) =>
+                SignPage(email: args['email']!, password: args['password']!),
+          );
+        }
+        return null;
       },
-      debugShowMaterialGrid: false,
-      initialRoute: LoginPage().id,
     );
   }
 }
