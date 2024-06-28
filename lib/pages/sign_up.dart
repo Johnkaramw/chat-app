@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:scholar_chat/consts.dart';
@@ -10,7 +12,7 @@ class SignPage extends StatelessWidget {
   static const String id = 'sign_up'; // إضافة معرف ثابت للصفحة
   final String email;
   final String password;
-
+  GlobalKey<FormState> formkye = GlobalKey();
   SignPage({required this.email, required this.password});
 
   @override
@@ -19,71 +21,95 @@ class SignPage extends StatelessWidget {
       backgroundColor: kPrimaryColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 9),
-        child: ListView(
-          children: [
-            Image.asset('assets/images/scholar.png'),
-            const Row(
-              children: [
-                Text(
-                  'sign up',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 30,
+        child: Form(
+          key: formkye,
+          child: Column(
+            children: [
+              Image.asset('assets/images/scholar.png'),
+              const Row(
+                children: [
+                  Text(
+                    'sign up',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 30,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            CustomText(
-              hintText: 'email',
-              onChanged: (data) {
-                // لست بحاجة لتحديث email هنا لأنه يتم تمريره كباني
-              },
-            ),
-            const SizedBox(height: 10),
-            CustomText(
-              hintText: 'password',
-              onChanged: (data) {
-                // لست بحاجة لتحديث password هنا لأنه يتم تمريره كباني
-              },
-            ),
-            const SizedBox(height: 10),
-            CustomPotton(
-              ontap: () async {
-                var auth = FirebaseAuth.instance;
-                try {
-                  await auth.createUserWithEmailAndPassword(
-                      email: email, password: password);
-                } catch (e) {
-                  print(e);
-                }
-              },
-              text: 'sign up  ',
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  '  already have an account',
-                  style: TextStyle(
-                    color: Colors.black,
+                ],
+              ),
+              const SizedBox(height: 10),
+              CustomText(
+                hintText: 'email',
+                onChanged: (data) {
+                  // لست بحاجة لتحديث email هنا لأنه يتم تمريره كباني
+                },
+              ),
+              const SizedBox(height: 10),
+              CustomText(
+                hintText: 'password',
+                onChanged: (data) {
+                  // لست بحاجة لتحديث password هنا لأنه يتم تمريره كباني
+                },
+              ),
+              const SizedBox(height: 10),
+              CustomPotton(
+                ontap: () async {
+                  FirebaseAuth.instance;
+                  if (formkye.currentState!.validate()) {
+                    try {
+                      await signup();
+                    } on FirebaseAuthException catch (ex) {
+                      if (ex.code == 'wak password') {
+                        snackbar(context, 'wak password');
+                      } else if (ex.code == 'the email already ues') {
+                        snackbar(context, 'the email alraedy use in');
+                      }
+                    } catch (ex) {
+                      snackbar(context, 'not found email or password');
+                    }
+                    snackbar(context, ' success email');
+                  }
+                },
+                text: 'sign up  ',
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    '  already have an account',
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, LoginPage.id);
-                  },
-                  child: const Text(
-                    '  login',
-                    style: TextStyle(color: Colors.red),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, LoginPage.id);
+                    },
+                    child: const Text(
+                      '  login',
+                      style: TextStyle(color: Colors.red),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  void snackbar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  Future<void> signup() async {
+    UserCredential user = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
   }
 }

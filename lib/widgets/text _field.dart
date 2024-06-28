@@ -3,12 +3,16 @@
 import 'package:flutter/material.dart';
 
 class CustomText extends StatelessWidget {
-  CustomText({this.hintText,this.onChanged});
+  CustomText({this.hintText, this.onChanged});
   String? hintText;
   Function(String)? onChanged;
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
+      validator: (data) {
+        if (data!.isEmpty) ;
+        return 'error found';
+      },
       onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hintText, // تم تصحيح الاسم هنا
