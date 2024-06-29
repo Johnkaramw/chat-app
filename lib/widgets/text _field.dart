@@ -10,8 +10,7 @@ class CustomText extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       validator: (data) {
-        if (data!.isEmpty) ;
-        return 'error found';
+        if (data!.isEmpty) return 'error found';
       },
       onChanged: onChanged,
       decoration: InputDecoration(
