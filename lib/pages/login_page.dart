@@ -4,48 +4,37 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:scholar_chat/consts.dart';
+import 'package:scholar_chat/helper/show_snack_bar.dart';
 import 'package:scholar_chat/pages/sign_up.dart';
 import 'package:scholar_chat/widgets/pottons.dart';
 import 'package:scholar_chat/widgets/text%20_field.dart';
 
 class LoginPage extends StatefulWidget {
-  static const String id = 'login_page';
-  final String email;
-  final String password;
-
-  LoginPage({required this.email, required this.password});
+  static const String id = 'loginPage'; // إضافة معرف ثابت للصفحة
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool inloding = false;
-  GlobalKey<FormState> logkye = GlobalKey();
+  bool inLoading = false;
+  GlobalKey<FormState> logKey = GlobalKey();
 
-  // تعريف المتغيرات لتحديث القيم المدخلة
-  late String email;
-  late String password;
-
-  @override
-  void initState() {
-    super.initState();
-    // تهيئة المتغيرات بالقيم الممررة من الويدجت
-    email = widget.email;
-    password = widget.password;
-  }
+  // تعريف المتغيرات
+  String email = '';
+  String password = '';
 
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
       return ModalProgressHUD(
-        inAsyncCall: inloding,
+        inAsyncCall: inLoading,
         child: Scaffold(
           backgroundColor: kPrimaryColor,
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 9),
             child: Form(
-              key: logkye,
+              key: logKey,
               child: Column(
                 children: [
                   const Spacer(flex: 1),
@@ -59,8 +48,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const Spacer(flex: 2),
-                  const Row(
-                    children: [
+                  Row(
+                    children: const [
                       Text(
                         '   LOGIN ',
                         style: TextStyle(
@@ -87,30 +76,30 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 10),
                   CustomPotton(
                     ontap: () async {
-                      FirebaseAuth.instance;
-                      if (logkye.currentState!.validate()) {
-                        inloding = true;
-                        setState(() {});
+                      if (logKey.currentState!.validate()) {
+                        setState(() {
+                          inLoading = true;
+                        });
                         try {
                           await login();
                           snackbar(context, 'success email');
                         } on FirebaseAuthException catch (ex) {
-                          if (ex.code == 'pleas create email') {
-                            snackbar(context, 'please create email');
-                          } else if (ex.code ==
-                              'the email already not use in') {
-                            snackbar(context, 'the email already not use in');
+                          if (ex.code == 'user-not-found') {
+                            snackbar(context, 'User not found');
+                          } else if (ex.code == 'wrong-password') {
+                            snackbar(context, 'Incorrect password');
                           }
                         } catch (ex) {
-                          snackbar(context, 'not found email or password');
+                          snackbar(context, 'An error occurred');
                         }
-                        inloding = false;
-                        setState(() {});
+                        setState(() {
+                          inLoading = false;
+                        });
                       }
                     },
                     text: 'login',
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -122,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, SignPage.id);
+                          Navigator.pop(context, SignPage);
                         },
                         child: const Text(
                           '   sign up',
@@ -141,19 +130,8 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void snackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-  }
-
   Future<void> login() async {
-    UserCredential user =
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    UserCredential user = await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password);
   }
 }

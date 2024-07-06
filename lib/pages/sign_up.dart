@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:scholar_chat/consts.dart';
+import 'package:scholar_chat/helper/show_snack_bar.dart';
 import 'package:scholar_chat/pages/login_page.dart';
 import 'package:scholar_chat/widgets/pottons.dart';
 import '../widgets/text _field.dart';
@@ -11,30 +12,28 @@ import '../widgets/text _field.dart';
 // ignore: must_be_immutable
 class SignPage extends StatefulWidget {
   static const String id = 'sign_up'; // إضافة معرف ثابت للصفحة
-  final String email;
-  final String password;
-
-  SignPage({required this.email, required this.password});
 
   @override
   State<SignPage> createState() => _SignPageState();
 }
 
 class _SignPageState extends State<SignPage> {
-  bool isloding = false;
+  bool isLoading = false;
+  GlobalKey<FormState> formKey = GlobalKey();
 
-  GlobalKey<FormState> formkye = GlobalKey();
+  String email = '';
+  String password = '';
 
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
-      inAsyncCall: isloding,
+      inAsyncCall: isLoading,
       child: Scaffold(
         backgroundColor: kPrimaryColor,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 9),
           child: Form(
-            key: formkye,
+            key: formKey,
             child: Column(
               children: [
                 Image.asset('assets/images/scholar.png'),
@@ -53,57 +52,62 @@ class _SignPageState extends State<SignPage> {
                 CustomText(
                   hintText: 'email',
                   onChanged: (data) {
-                    // لست بحاجة لتحديث email هنا لأنه يتم تمريره كباني
+                    setState(() {
+                      email = data;
+                    });
                   },
                 ),
                 const SizedBox(height: 10),
                 CustomText(
                   hintText: 'password',
                   onChanged: (data) {
-                    // لست بحاجة لتحديث password هنا لأنه يتم تمريره كباني
+                    setState(() {
+                      password = data;
+                    });
                   },
                 ),
                 const SizedBox(height: 10),
                 CustomPotton(
                   ontap: () async {
-                    FirebaseAuth.instance;
-                    if (formkye.currentState!.validate()) {
-                      isloding = true;
-                      setState(() {});
+                    if (formKey.currentState!.validate()) {
+                      setState(() {
+                        isLoading = true;
+                      });
                       try {
                         await signup();
-                        snackbar(context, ' success email');
+                        snackbar(context, 'Success email');
                       } on FirebaseAuthException catch (ex) {
-                        if (ex.code == 'wak password') {
-                          snackbar(context, 'wak password');
-                        } else if (ex.code == 'the email already ues') {
-                          snackbar(context, 'the email alraedy use in');
+                        if (ex.code == 'weak-password') {
+                          snackbar(context, 'Weak password');
+                        } else if (ex.code == 'email-already-in-use') {
+                          snackbar(context, 'Email already in use');
                         }
                       } catch (ex) {
-                        snackbar(context, 'not found email or password');
+                        snackbar(context, 'Error occurred');
                       }
-                      isloding = false;
-                      setState(() {});
+                      setState(() {
+                        isLoading = false;
+                      });
                     }
                   },
-                  text: 'sign up  ',
+                  text: 'sign up',
                 ),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      '  already have an account',
+                      'already have an account',
                       style: TextStyle(
                         color: Colors.black,
                       ),
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, LoginPage.id);
+                        Navigator.pop(context, LoginPage);
                       },
                       child: const Text(
-                        '  login',
+                        'login',
                         style: TextStyle(color: Colors.red),
                       ),
                     ),
@@ -117,17 +121,8 @@ class _SignPageState extends State<SignPage> {
     );
   }
 
-  void snackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-  }
-
   Future<void> signup() async {
     UserCredential user = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(
-            email: widget.email, password: widget.password);
+        .createUserWithEmailAndPassword(email: email, password: password);
   }
 }

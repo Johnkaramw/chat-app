@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, body_might_complete_normally_nullable
 
 import 'package:flutter/material.dart';
 
@@ -20,7 +20,7 @@ class CustomText extends StatelessWidget {
             color: Color.fromARGB(255, 21, 255, 0),
           ),
         ),
-        border: OutlineInputBorder(
+        border: const OutlineInputBorder(
           borderSide: BorderSide(
             color: Color.fromARGB(255, 0, 0, 0),
           ),
