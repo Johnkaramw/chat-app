@@ -10,8 +10,9 @@ import 'package:scholar_chat/widgets/pottons.dart';
 import '../widgets/text _field.dart';
 
 // ignore: must_be_immutable
+
 class SignPage extends StatefulWidget {
-  static const String id = 'sign_up'; // إضافة معرف ثابت للصفحة
+  static const String id = 'signPage'; // Route ID for SignPage
 
   @override
   State<SignPage> createState() => _SignPageState();
@@ -19,11 +20,10 @@ class SignPage extends StatefulWidget {
 
 class _SignPageState extends State<SignPage> {
   bool isLoading = false;
-  GlobalKey<FormState> formKey = GlobalKey();
 
-  String email = '';
-  String password = '';
-
+  final GlobalKey<FormState> formKey = GlobalKey();
+  String? email = '';
+  String? password = '';
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
@@ -104,7 +104,7 @@ class _SignPageState extends State<SignPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context, LoginPage);
+                        Navigator.pushNamed(context, LoginPage.id);
                       },
                       child: const Text(
                         'login',
@@ -123,6 +123,6 @@ class _SignPageState extends State<SignPage> {
 
   Future<void> signup() async {
     UserCredential user = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password);
+        .createUserWithEmailAndPassword(email: email!, password: password!);
   }
 }

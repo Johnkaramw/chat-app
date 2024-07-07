@@ -10,7 +10,7 @@ import 'package:scholar_chat/widgets/pottons.dart';
 import 'package:scholar_chat/widgets/text%20_field.dart';
 
 class LoginPage extends StatefulWidget {
-  static const String id = 'loginPage'; // إضافة معرف ثابت للصفحة
+  static const String id = 'loginPage'; // Route ID for LoginPage
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -18,116 +18,119 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool inLoading = false;
-  GlobalKey<FormState> logKey = GlobalKey();
+  final GlobalKey<FormState> logKey = GlobalKey();
 
-  // تعريف المتغيرات
+  // Defining variables
+
   String email = '';
   String password = '';
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      return ModalProgressHUD(
-        inAsyncCall: inLoading,
-        child: Scaffold(
-          backgroundColor: kPrimaryColor,
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 9),
-            child: Form(
-              key: logKey,
-              child: Column(
-                children: [
-                  const Spacer(flex: 1),
-                  Image.asset('assets/images/scholar.png'),
-                  const Text(
-                    'App Chat',
-                    style: TextStyle(
-                      fontSize: 30,
-                      color: Colors.black,
-                      fontFamily: 'Pacifico',
+    return ModalProgressHUD(
+      inAsyncCall: inLoading,
+      child: Scaffold(
+        backgroundColor: kPrimaryColor,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 9),
+          child: Form(
+            key: logKey,
+            child: Column(
+              children: [
+                const Spacer(flex: 1),
+                Image.asset('assets/images/scholar.png'),
+                const Text(
+                  'App Chat',
+                  style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.black,
+                    fontFamily: 'Pacifico',
+                  ),
+                ),
+                const Spacer(flex: 2),
+                const Row(
+                  children: [
+                    Text(
+                      '   LOGIN ',
+                      style: TextStyle(
+                        fontSize: 30,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                  const Spacer(flex: 2),
-                  Row(
-                    children: const [
-                      Text(
-                        '   LOGIN ',
-                        style: TextStyle(
-                          fontSize: 30,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  CustomText(
-                    hintText: 'email',
-                    onChanged: (data) {
+                  ],
+                ),
+                const SizedBox(height: 10),
+                CustomText(
+                  hintText: 'email',
+                  onChanged: (data) {
+                    setState(() {
                       email = data;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  CustomText(
-                    hintText: 'password',
-                    onChanged: (data) {
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+                CustomText(
+                  hintText: 'password',
+                  onChanged: (data) {
+                    setState(() {
                       password = data;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  CustomPotton(
-                    ontap: () async {
-                      if (logKey.currentState!.validate()) {
-                        setState(() {
-                          inLoading = true;
-                        });
-                        try {
-                          await login();
-                          snackbar(context, 'success email');
-                        } on FirebaseAuthException catch (ex) {
-                          if (ex.code == 'user-not-found') {
-                            snackbar(context, 'User not found');
-                          } else if (ex.code == 'wrong-password') {
-                            snackbar(context, 'Incorrect password');
-                          }
-                        } catch (ex) {
-                          snackbar(context, 'An error occurred');
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+                CustomPotton(
+                  ontap: () async {
+                    if (logKey.currentState!.validate()) {
+                      setState(() {
+                        inLoading = true;
+                      });
+                      try {
+                        await login();
+                        snackbar(context, 'Login successful');
+                      } on FirebaseAuthException catch (ex) {
+                        if (ex.code == 'user-not-found') {
+                          snackbar(context, 'User not found');
+                        } else if (ex.code == 'wrong-password') {
+                          snackbar(context, 'Incorrect password');
                         }
-                        setState(() {
-                          inLoading = false;
-                        });
+                      } catch (ex) {
+                        snackbar(context, 'An error occurred');
                       }
-                    },
-                    text: 'login',
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'don\'t have an account! ',
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
+                      setState(() {
+                        inLoading = false;
+                      });
+                    }
+                  },
+                  text: 'login',
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'don\'t have an account! ',
+                      style: TextStyle(
+                        color: Colors.black,
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context, SignPage);
-                        },
-                        child: const Text(
-                          '   sign up',
-                          style: TextStyle(color: Colors.red, fontSize: 15),
-                        ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, SignPage.id);
+                      },
+                      child: const Text(
+                        '   sign up',
+                        style: TextStyle(color: Colors.red, fontSize: 15),
                       ),
-                    ],
-                  ),
-                  const Spacer(flex: 4),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+                const Spacer(flex: 4),
+              ],
             ),
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   Future<void> login() async {
