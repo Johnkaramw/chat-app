@@ -16,7 +16,7 @@ class ChatApp extends StatelessWidget {
         'loginPage': (context) => LoginPage(),
         'signPage': (context) => SignPage(),
       },
-      initialRoute: 'LoginPage',
+      initialRoute: LoginPage.id,
     );
   }
 }

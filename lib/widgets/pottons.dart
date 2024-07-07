@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class CustomPotton extends StatelessWidget {
-  CustomPotton({required this.text ,this.ontap});
+  CustomPotton({required this.text, this.ontap});
   String text;
-  VoidCallback? ontap ;
+  VoidCallback? ontap;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
